@@ -9,7 +9,6 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("traveler");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +18,8 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await register(name, email, password, role);
+      // Normal signup defaults user to traveler
+      await register(name, email, password, "traveler");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create account. Please try again.");
     } finally {
@@ -34,10 +34,16 @@ export default function SignupPage() {
           <h2 className="mt-6 text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
             Create Account
           </h2>
-          <p className="mt-2 text-sm text-zinc-650 dark:text-zinc-400">
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Ready to explore? Or{" "}
             <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
               sign in to existing
+            </Link>
+          </p>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            Want a demo login?{" "}
+            <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+              click here
             </Link>
           </p>
         </div>
@@ -96,36 +102,6 @@ export default function SignupPage() {
                 className="mt-1 block w-full rounded-full border border-zinc-300 px-4 py-2.5 text-zinc-900 placeholder-zinc-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 placeholder="••••••••"
               />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Choose Role
-              </label>
-              <div className="mt-2 grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole("traveler")}
-                  className={`flex w-full items-center justify-center rounded-full border px-4 py-2 text-xs font-semibold shadow-sm transition-all focus:outline-none ${
-                    role === "traveler"
-                      ? "border-blue-600 bg-blue-50 text-blue-750 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-400"
-                      : "border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700/50"
-                  }`}
-                >
-                  🌐 Traveler (User)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("admin")}
-                  className={`flex w-full items-center justify-center rounded-full border px-4 py-2 text-xs font-semibold shadow-sm transition-all focus:outline-none ${
-                    role === "admin"
-                      ? "border-blue-600 bg-blue-50 text-blue-750 dark:border-blue-500 dark:bg-blue-950/40 dark:text-blue-400"
-                      : "border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700/50"
-                  }`}
-                >
-                  🛠️ Admin
-                </button>
-              </div>
             </div>
           </div>
 

@@ -2,17 +2,18 @@ import { Request, Response } from "express";
 import { authService } from "./auth.service";
 
 async function register(req: Request, res: Response): Promise<void> {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
 
   if (!name || !email) {
     res.status(400).json({
-      error: { message: "Name and email are required" },
+      error: { message: "Name and email are required" }
     });
     return;
   }
 
   try {
-    const user = await authService.register(name, email, password, role);
+    // Normal registration always defaults strictly to "traveler" role for security
+    const user = await authService.register(name, email, password, "traveler");
     res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -20,13 +21,13 @@ async function register(req: Request, res: Response): Promise<void> {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-      },
+        role: user.role
+      }
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     res.status(400).json({
-      error: { message: errorMessage },
+      error: { message: errorMessage }
     });
   }
 }
@@ -36,7 +37,7 @@ async function login(req: Request, res: Response): Promise<void> {
 
   if (!email || !password) {
     res.status(400).json({
-      error: { message: "Email and password are required" },
+      error: { message: "Email and password are required" }
     });
     return;
   }
@@ -47,7 +48,7 @@ async function login(req: Request, res: Response): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     res.status(400).json({
-      error: { message: errorMessage },
+      error: { message: errorMessage }
     });
   }
 }
@@ -57,7 +58,7 @@ async function googleLogin(req: Request, res: Response): Promise<void> {
 
   if (!idToken) {
     res.status(400).json({
-      error: { message: "Google ID Token is required" },
+      error: { message: "Google ID Token is required" }
     });
     return;
   }
@@ -68,7 +69,7 @@ async function googleLogin(req: Request, res: Response): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     res.status(400).json({
-      error: { message: errorMessage },
+      error: { message: errorMessage }
     });
   }
 }
