@@ -1,13 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePackageDetails, usePackages, Package } from "@/hooks/usePackages";
+import { useAuth } from "@/context/AuthContext";
+import { useCreateBooking } from "@/hooks/useBookings";
 
 export default function PackageDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
+  const { user } = useAuth();
 
   // Fetch package details
   const { data: detailData, isLoading: isDetailLoading, error: detailError } = usePackageDetails(id);
@@ -15,6 +19,31 @@ export default function PackageDetailPage() {
 
   // Gallery state
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+
+  // Booking state
+  const createBookingMutation = useCreateBooking();
+  const [showBookingConfirm, setShowBookingConfirm] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const handleBookNow = () => {
+    if (!user) {
+      router.push(`/login?redirect=/packages/${id}`);
+      return;
+    }
+    setShowBookingConfirm(true);
+  };
+
+  const confirmBooking = async () => {
+    try {
+      await createBookingMutation.mutateAsync({ packageId: id });
+      setBookingMessage({ type: "success", text: "Expedition booked successfully! Your request status is pending." });
+      setShowBookingConfirm(false);
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to create booking request.";
+      setBookingMessage({ type: "error", text: errorMsg });
+      setShowBookingConfirm(false);
+    }
+  };
 
   // Fetch general packages for related suggestions
   const { data: listData, isLoading: isListLoading } = usePackages({ limit: 4 });
@@ -152,6 +181,28 @@ export default function PackageDetailPage() {
 
             {/* Custom CTA Action */}
             <div className="pt-4 space-y-3">
+              {bookingMessage && (
+                <div
+                  className={`p-3 border rounded-xl text-xs font-semibold ${
+                    bookingMessage.type === "success"
+                      ? "bg-emerald-50 border-emerald-250 text-emerald-800"
+                      : "bg-rose-50 border-rose-250 text-rose-800"
+                  }`}
+                >
+                  {bookingMessage.text}
+                </div>
+              )}
+
+              {user?.role !== "admin" && (
+                <button
+                  onClick={handleBookNow}
+                  disabled={createBookingMutation.isPending}
+                  className="w-full text-center block bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 text-sm rounded-xl shadow-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {createBookingMutation.isPending ? "Booking..." : "Book Now"}
+                </button>
+              )}
+
               <Link
                 href={`/trip-planner?packageId=${pkg._id}`}
                 className="w-full text-center block bg-secondary hover:bg-secondary-dark text-white font-semibold py-3 px-6 text-sm rounded-xl shadow-md transition-colors"
@@ -280,6 +331,37 @@ export default function PackageDetailPage() {
         )}
 
       </div>
+
+      {/* Booking Confirmation Modal */}
+      {showBookingConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs transition-opacity" onClick={() => setShowBookingConfirm(false)} />
+          
+          <div className="relative bg-white rounded-2xl max-w-md w-full border border-neutral-200 p-6 shadow-xl animate-scale-in">
+            <h3 className="font-fraunces text-lg font-semibold text-neutral-900 mb-2">
+              Confirm Booking
+            </h3>
+            <p className="text-xs text-neutral-700 leading-relaxed mb-6 font-sans">
+              Are you sure you want to book <span className="font-semibold text-neutral-900">&ldquo;{pkg.title}&rdquo;</span> for <span className="font-bold text-secondary">${pkg.price}</span>? Your booking status will be pending approval.
+            </p>
+
+            <div className="flex items-center justify-end gap-3.5">
+              <button
+                onClick={() => setShowBookingConfirm(false)}
+                className="px-4 py-2 border border-neutral-200 text-neutral-750 hover:bg-neutral-100 hover:text-neutral-950 rounded-xl text-xs font-semibold transition-colors font-sans"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmBooking}
+                className="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-6 rounded-xl text-xs transition-all font-sans"
+              >
+                Confirm & Book
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

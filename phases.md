@@ -134,16 +134,20 @@
 
 **server/**
 - `modules/tripRequests/` (`tripRequests.routes.ts`, `controller.ts`, `service.ts`, `types.ts`): create request (`pending`), admin quote/reject, traveler accept (`approved`). Status transitions enforced server-side, never trusted from the client.
-- `modules/bookings/`: approved trip requests (and standard package bookings) land here.
+- `modules/bookings/` (`bookings.routes.ts`, `bookings.controller.ts`, `bookings.service.ts`, `bookings.types.ts`): standard package bookings workflow. Creates pending bookings for logged-in travelers (POST `/api/bookings`), lists bookings, and allows admins to approve/reject status (PATCH `/api/bookings/:id/status`).
 
 **client/**
 - "Request this trip" action wired into the Trip Planner / Chat Widget → creates a `pending` request.
-- `app/my-trips/page.tsx`: traveler's requests with status badges (pending/quoted/approved/rejected).
-- `app/items/manage/page.tsx` extended with a "Custom Requests" tab: view, quote, approve, reject.
+- `app/my-trips/page.tsx`: traveler's custom requests with status badges.
+- `app/my-bookings/page.tsx`: traveler's standard package bookings with status badges (pending, approved, rejected) to keep track of booking requests.
+- `app/packages/[id]/page.tsx` updated with a "Book Now" CTA above the AI planner button, confirming reservation request of standard packages for logged-in travelers.
+- `app/items/manage/page.tsx` extended with two tabs:
+  - "My Packages" for CRUD package templates.
+  - "Standard Bookings" to view, approve, and reject passenger booking requests.
 
 **Deployment:** redeploy; run a full request → quote → accept cycle live, and confirm rejected/pending states also render correctly in production.
 
-**Done when:** the complete approval workflow is demoable on the live site.
+**Done when:** the complete custom and standard booking approval workflow is demoable on the live site.
 
 ---
 

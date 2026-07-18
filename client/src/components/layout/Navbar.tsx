@@ -15,7 +15,7 @@ export default function Navbar() {
 
   const travelerLinks = [
     { name: "AI Planner", href: "/trip-planner" },
-    { name: "My Trips", href: "/my-trips" },
+    { name: "My Bookings", href: "/my-bookings" },
   ];
 
   const adminLinks = [

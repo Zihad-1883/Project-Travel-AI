@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { apiFetch } from "@/lib/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useBookings, useUpdateBookingStatus, Booking } from "@/hooks/useBookings";
 
 interface Package {
   _id: string;
@@ -41,11 +42,31 @@ export default function ManagePackagesPage() {
     }
   }, [user, loading, router]);
 
+  // Tab Navigation State
+  const [activeTab, setActiveTab] = useState<"packages" | "bookings">("packages");
+
   // Modal and action states
   const [deleteTarget, setDeleteTarget] = useState<Package | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [showNotification, setShowNotification] = useState<string | null>(null);
+
+  // Fetch admin bookings
+  const { data: bookingsList = [], isLoading: isBookingsLoading, error: bookingsError } = useBookings();
+  const updateBookingMutation = useUpdateBookingStatus();
+
+  const handleUpdateBookingStatus = async (bookingId: string, status: "approved" | "rejected") => {
+    setActionError(null);
+    try {
+      await updateBookingMutation.mutateAsync({ id: bookingId, status });
+      setShowNotification(`Booking status updated successfully to ${status}.`);
+      setTimeout(() => {
+        setShowNotification(null);
+      }, 3000);
+    } catch (err: unknown) {
+      setActionError(err instanceof Error ? err.message : "Failed to update booking status.");
+    }
+  };
 
   // Fetch admin specific packages
   const { data, isLoading, error } = useQuery<PackagesListResponse, Error>({
@@ -173,103 +194,222 @@ export default function ManagePackagesPage() {
         <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm">
           {/* Tabs Navigation Header */}
           <div className="border-b border-neutral-200 px-6 py-4 flex items-center justify-between bg-neutral-50/50">
-            <div className="flex gap-6 border-b border-transparent">
-              <button className="text-sm font-semibold text-primary pb-1 border-b-2 border-primary -mb-[18px]">
+            <div className="flex gap-6">
+              <button
+                onClick={() => setActiveTab("packages")}
+                className={`text-sm font-semibold pb-1 cursor-pointer transition-colors ${
+                  activeTab === "packages"
+                    ? "text-primary border-b-2 border-primary -mb-[18px]"
+                    : "text-neutral-450 hover:text-neutral-900 font-medium"
+                }`}
+              >
                 My Packages
               </button>
+              <button
+                onClick={() => setActiveTab("bookings")}
+                className={`text-sm font-semibold pb-1 cursor-pointer transition-colors ${
+                  activeTab === "bookings"
+                    ? "text-primary border-b-2 border-primary -mb-[18px]"
+                    : "text-neutral-450 hover:text-neutral-900 font-medium"
+                }`}
+              >
+                Standard Bookings
+              </button>
             </div>
-            <span className="text-xs text-neutral-400 font-mono">Count: {list.length}</span>
+            <span className="text-xs text-neutral-400 font-mono">
+              Count: {activeTab === "packages" ? list.length : bookingsList.length}
+            </span>
           </div>
 
           {/* List/Table section */}
-          {isLoading ? (
-            <div className="p-16 flex flex-col items-center justify-center gap-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-250 border-t-primary" />
-              <span className="text-xs text-neutral-450">Loading operations queue...</span>
-            </div>
-          ) : error ? (
-            <div className="p-16 text-center text-xs font-medium text-rose-500">
-              Error fetching active templates catalog: {error.message}
-            </div>
-          ) : list.length === 0 ? (
-            <div className="p-16 text-center">
-              <div className="text-3xl mb-3">🏔️</div>
-              <h3 className="font-semibold text-sm text-neutral-800 mb-1">No Proposals Found</h3>
-              <p className="text-xs text-neutral-750 max-w-sm mx-auto mb-6">
-                You haven&apos;t published any expedition packages yet. Create a package template so travelers can customize their trip itineraries.
-              </p>
-              <Link
-                href="/items/add"
-                className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 font-semibold py-2 px-4 rounded-xl text-xs transition-all"
-              >
-                ＋ Publish Your First Package
-              </Link>
-            </div>
-          ) : (
-            <div className="divide-y divide-neutral-200">
-              {list.map((pkg) => (
-                <div key={pkg._id} className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 hover:bg-neutral-50/20 transition-all font-sans">
-                  
-                  {/* Left block info */}
-                  <div className="flex items-start gap-4">
-                    <div className="h-16 w-20 rounded-xl overflow-hidden bg-neutral-105 border border-neutral-200 shrink-0 relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={pkg.images[0] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=300&q=80"}
-                        alt={pkg.title}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded">
-                          {pkg.location}
-                        </span>
-                        <span className="text-xs text-neutral-450 bg-neutral-100 px-2 py-0.5 rounded font-mono">
-                          ★ {pkg.rating.toFixed(1)}
-                        </span>
+          {activeTab === "packages" ? (
+            isLoading ? (
+              <div className="p-16 flex flex-col items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-250 border-t-primary" />
+                <span className="text-xs text-neutral-450">Loading operations queue...</span>
+              </div>
+            ) : error ? (
+              <div className="p-16 text-center text-xs font-medium text-rose-500">
+                Error fetching active templates catalog: {error.message}
+              </div>
+            ) : list.length === 0 ? (
+              <div className="p-16 text-center">
+                <div className="text-3xl mb-3">🏔️</div>
+                <h3 className="font-semibold text-sm text-neutral-800 mb-1">No Proposals Found</h3>
+                <p className="text-xs text-neutral-750 max-w-sm mx-auto mb-6">
+                  You haven&apos;t published any expedition packages yet. Create a package template so travelers can customize their trip itineraries.
+                </p>
+                <Link
+                  href="/items/add"
+                  className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-800 font-semibold py-2 px-4 rounded-xl text-xs transition-all"
+                >
+                  ＋ Publish Your First Package
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-200">
+                {list.map((pkg) => (
+                  <div key={pkg._id} className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 hover:bg-neutral-50/20 transition-all font-sans">
+                    
+                    {/* Left block info */}
+                    <div className="flex items-start gap-4">
+                      <div className="h-16 w-20 rounded-xl overflow-hidden bg-neutral-105 border border-neutral-200 shrink-0 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={pkg.images[0] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=300&q=80"}
+                          alt={pkg.title}
+                          className="h-full w-full object-cover"
+                        />
                       </div>
-                      <h4 className="font-fraunces text-base font-semibold text-neutral-900 leading-snug">
-                        <Link href={`/packages/${pkg._id}`} className="hover:text-primary transition-colors">
-                          {pkg.title}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                            {pkg.location}
+                          </span>
+                          <span className="text-xs text-neutral-450 bg-neutral-100 px-2 py-0.5 rounded font-mono">
+                            ★ {pkg.rating.toFixed(1)}
+                          </span>
+                        </div>
+                        <h4 className="font-fraunces text-base font-semibold text-neutral-900 leading-snug">
+                          <Link href={`/packages/${pkg._id}`} className="hover:text-primary transition-colors">
+                            {pkg.title}
+                          </Link>
+                        </h4>
+                        <p className="text-xs text-neutral-400 mt-1 line-clamp-1">
+                          {pkg.shortDescription || "No summary teaser description published."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right specs and delete action triggers */}
+                    <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 pt-4 sm:pt-0">
+                      <div className="text-left sm:text-right">
+                        <span className="text-[10px] text-neutral-450 block uppercase tracking-wider">Duration / Price</span>
+                        <span className="text-xs font-semibold text-neutral-900 block mt-0.5">{pkg.duration}</span>
+                        <span className="text-sm font-bold text-secondary">${pkg.price}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/packages/${pkg._id}`}
+                          className="px-3.5 py-1.5 border border-neutral-250 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg text-xs font-semibold transition-colors"
+                        >
+                          View
                         </Link>
-                      </h4>
-                      <p className="text-xs text-neutral-400 mt-1 line-clamp-1">
-                        {pkg.shortDescription || "No summary teaser description published."}
-                      </p>
+                        <button
+                          onClick={() => setDeleteTarget(pkg)}
+                          className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all focus:outline-none"
+                          aria-label="Delete Package"
+                        >
+                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
+
                   </div>
+                ))}
+              </div>
+            )
+          ) : (
+            isBookingsLoading ? (
+              <div className="p-16 flex flex-col items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-neutral-250 border-t-primary" />
+                <span className="text-xs text-neutral-450">Loading booking records...</span>
+              </div>
+            ) : bookingsError ? (
+              <div className="p-16 text-center text-xs font-medium text-rose-500">
+                Error fetching bookings: {bookingsError.message}
+              </div>
+            ) : bookingsList.length === 0 ? (
+              <div className="p-16 text-center">
+                <div className="text-3xl mb-3">📋</div>
+                <h3 className="font-semibold text-sm text-neutral-800 mb-1">No Bookings Request</h3>
+                <p className="text-xs text-neutral-750 max-w-sm mx-auto">
+                  There are currently no package bookings submitted by travelers.
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-neutral-200">
+                {bookingsList.map((booking: Booking) => {
+                  const pkg = booking.packageDetails;
+                  if (!pkg) return null;
 
-                  {/* Right specs and delete action triggers */}
-                  <div className="flex items-center justify-between sm:justify-end gap-8 border-t sm:border-t-0 pt-4 sm:pt-0">
-                    <div className="text-left sm:text-right">
-                      <span className="text-[10px] text-neutral-450 block uppercase tracking-wider">Duration / Price</span>
-                      <span className="text-xs font-semibold text-neutral-900 block mt-0.5">{pkg.duration}</span>
-                      <span className="text-sm font-bold text-secondary">${pkg.price}</span>
+                  return (
+                    <div key={booking._id} className="p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 hover:bg-neutral-50/20 transition-all font-sans font-sans">
+                      {/* Left: Package + Traveler Details */}
+                      <div className="flex items-start gap-4">
+                        <div className="h-16 w-20 rounded-xl overflow-hidden bg-neutral-105 border border-neutral-200 shrink-0 relative">
+                          <img
+                            src={pkg.images[0] || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=300&q=80"}
+                            alt={pkg.title}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-[10px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded">
+                              {pkg.location}
+                            </span>
+                            <span className="text-xs text-neutral-400">
+                              Booked by <span className="font-semibold text-neutral-750">{booking.userDetails?.name || "Unknown"}</span> ({booking.userDetails?.email || "No email"})
+                            </span>
+                          </div>
+                          <h4 className="font-fraunces text-base font-semibold text-neutral-900 leading-snug">
+                            <Link href={`/packages/${pkg._id}`} className="hover:text-primary transition-colors">
+                              {pkg.title}
+                            </Link>
+                          </h4>
+                          <p className="text-[11px] text-neutral-400 mt-1">
+                            Submitted on {new Date(booking.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right: Booking price/status and action buttons */}
+                      <div className="flex items-center justify-between lg:justify-end gap-6 border-t lg:border-t-0 pt-4 lg:pt-0">
+                        <div className="text-left lg:text-right">
+                          <span className="text-[10px] text-neutral-450 block uppercase tracking-wider">Price</span>
+                          <span className="text-sm font-bold text-secondary">${pkg.price}</span>
+                        </div>
+
+                        {/* Status / Admin Actions */}
+                        <div className="flex items-center gap-3">
+                          {booking.status === "pending" ? (
+                            <>
+                              <button
+                                onClick={() => handleUpdateBookingStatus(booking._id, "approved")}
+                                disabled={updateBookingMutation.isPending}
+                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleUpdateBookingStatus(booking._id, "rejected")}
+                                disabled={updateBookingMutation.isPending}
+                                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                              booking.status === "approved"
+                                ? "bg-emerald-50 border-emerald-250 text-emerald-700"
+                                : "bg-rose-50 border-rose-200 text-rose-700"
+                            }`}>
+                              {booking.status === "approved" ? "Approved" : "Rejected"}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/packages/${pkg._id}`}
-                        className="px-3.5 py-1.5 border border-neutral-250 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg text-xs font-semibold transition-colors"
-                      >
-                        View
-                      </Link>
-                      <button
-                        onClick={() => setDeleteTarget(pkg)}
-                        className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all focus:outline-none"
-                        aria-label="Delete Package"
-                      >
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )
           )}
 
         </div>
