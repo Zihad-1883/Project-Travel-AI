@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import QueryProvider from "@/providers/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,13 +36,15 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 font-sans">
         <GoogleOAuthProvider clientId={googleClientId}>
-          <AuthProvider>
-            <Navbar />
-            <main className="flex-1 flex flex-col">
-              {children}
-            </main>
-            <Footer />
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <Navbar />
+              <main className="flex-1 flex flex-col">
+                {children}
+              </main>
+              <Footer />
+            </AuthProvider>
+          </QueryProvider>
         </GoogleOAuthProvider>
       </body>
     </html>
