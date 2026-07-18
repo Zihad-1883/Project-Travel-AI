@@ -60,8 +60,13 @@ function ExploreContent() {
     router.push("/explore");
   };
 
-  const packagesList = data?.data?.packages || [];
-  const pagination = data?.data?.pagination || { total: 0, page: 1, limit: 6, totalPages: 1 };
+  const packagesList = data?.packages || [];
+  const pagination = {
+    total: data?.total || 0,
+    page: data?.page || 1,
+    limit: data?.limit || 6,
+    totalPages: data?.totalPages || 1,
+  };
 
   return (
     <main className="min-h-screen bg-neutral-50 py-12 px-6 lg:px-8">
