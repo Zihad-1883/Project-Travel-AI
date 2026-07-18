@@ -7,8 +7,10 @@ interface FetchOptions extends RequestInit {
 export async function apiFetch<T>(path: string, options: FetchOptions = {}): Promise<T> {
   const { params, headers, ...customConfig } = options;
   
-  // Bulid URL with query parameters
-  let url = `${API_URL}${path}`;
+  // Build URL with query parameters, avoiding double slashes
+  const baseUrl = API_URL.endsWith("/") ? API_URL.slice(0, -1) : API_URL;
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  let url = `${baseUrl}${cleanPath}`;
   if (params) {
     const searchParams = new URLSearchParams(params);
     url += `?${searchParams.toString()}`;

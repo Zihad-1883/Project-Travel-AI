@@ -6,10 +6,30 @@ import apiRouter from "./routes";
 
 const app = express();
 
-// Standard middleware
+// Standard middleware supporting local development and deployed frontend URLs
+const allowedOrigins = [
+  env.CLIENT_URL,
+  "https://project-travel-ai.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:5000"
+];
+
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
+      
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        origin.startsWith("http://localhost:") || 
+                        origin.endsWith(".vercel.app");
+                        
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
   })
 );
