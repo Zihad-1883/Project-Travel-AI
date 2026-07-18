@@ -381,14 +381,14 @@ export default function ManagePackagesPage() {
                               <button
                                 onClick={() => handleUpdateBookingStatus(booking._id, "approved")}
                                 disabled={updateBookingMutation.isPending}
-                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                                className="px-3.5 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => handleUpdateBookingStatus(booking._id, "rejected")}
                                 disabled={updateBookingMutation.isPending}
-                                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                                className="px-3.5 py-1.5 bg-secondary hover:bg-secondary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                               >
                                 Reject
                               </button>
@@ -396,8 +396,8 @@ export default function ManagePackagesPage() {
                           ) : (
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
                               booking.status === "approved"
-                                ? "bg-emerald-50 border-emerald-250 text-emerald-700"
-                                : "bg-rose-50 border-rose-200 text-rose-700"
+                                ? "bg-primary/10 border-primary/20 text-primary"
+                                : "bg-secondary/10 border-secondary/20 text-secondary"
                             }`}>
                               {booking.status === "approved" ? "Approved" : "Rejected"}
                             </span>

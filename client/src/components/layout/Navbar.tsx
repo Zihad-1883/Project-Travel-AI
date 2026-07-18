@@ -20,7 +20,7 @@ export default function Navbar() {
 
   const adminLinks = [
     { name: "Add Package", href: "/items/add" },
-    { name: "Manage Packages", href: "/items/manage" },
+    { name: "Manage Booking & Packages", href: "/items/manage" },
   ];
 
   const footerCompanyLinks = [
@@ -43,7 +43,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-8">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-xl font-bold tracking-tight text-transparent dark:from-blue-400 dark:to-indigo-400">
+            <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-xl font-bold tracking-tight text-transparent">
               Travel AI
             </span>
           </Link>
@@ -56,9 +56,9 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-blue-600 dark:hover:text-blue-400 ${
+                className={`text-sm font-medium transition-colors hover:text-primary dark:hover:text-primary-light ${
                   isActive
-                    ? "text-blue-600 dark:text-blue-400"
+                    ? "text-primary dark:text-primary-light"
                     : "text-zinc-650 dark:text-zinc-400 hover:text-zinc-900"
                 }`}
               >
@@ -79,7 +79,7 @@ export default function Navbar() {
               </span>
               <button
                 onClick={logout}
-                className="inline-flex h-9 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                className="inline-flex h-9 items-center justify-center rounded-xl border border-zinc-300 dark:border-zinc-700 px-4 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer"
               >
                 Sign Out
               </button>
@@ -88,13 +88,13 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-zinc-700 hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
+                className="text-sm font-medium text-zinc-700 hover:text-primary dark:text-zinc-300 dark:hover:text-primary-light"
               >
                 Sign In
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-blue-600 px-4 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-500 hover:shadow-md dark:bg-blue-500 dark:hover:bg-blue-400"
+                className="inline-flex h-9 items-center justify-center rounded-xl bg-secondary px-4 text-sm font-medium text-white shadow-sm transition-all hover:bg-secondary-dark hover:shadow-md"
               >
                 Get Started
               </Link>

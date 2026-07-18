@@ -32,22 +32,22 @@ export default function MyBookingsPage() {
     switch (status) {
       case "approved":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 border border-primary/20 text-primary">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             Approved
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-secondary/10 border border-secondary/20 text-secondary">
+            <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
             Rejected
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 border border-amber-200 text-amber-700">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent/15 border border-accent/30 text-amber-800">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
             Pending Action
           </span>
         );

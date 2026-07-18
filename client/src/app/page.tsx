@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Destination {
   title: string;
@@ -30,6 +31,21 @@ interface FAQItem {
   question: string;
   answer: string;
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
+};
 
 export default function Home() {
   // Hero Interactive Slider State
@@ -155,27 +171,64 @@ export default function Home() {
       <section className="relative h-[65vh] w-full bg-neutral-900 text-white overflow-hidden">
         {/* Background Image Carousel Layer */}
         <div className="absolute inset-0 z-0 h-full w-full">
-          <img
-            src={destinations[activeSlide].bgUrl}
-            alt={destinations[activeSlide].title}
-            className="w-full h-full object-cover object-center transition-all duration-700 opacity-60"
-          />
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={activeSlide}
+              src={destinations[activeSlide].bgUrl}
+              alt={destinations[activeSlide].title}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 0.6, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-r from-neutral-900 via-neutral-900/60 to-transparent" />
         </div>
 
         {/* Content Box */}
         <div className="relative z-10 mx-auto max-w-7xl h-full px-6 flex flex-col justify-center max-w-2xl sm:px-8">
-          <span className="text-secondary font-semibold text-xs uppercase tracking-widest mb-2">
+          <motion.span 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-secondary font-semibold text-xs uppercase tracking-widest mb-2"
+          >
             Spotlight Destination
-          </span>
-          <h1 className="font-fraunces text-4xl sm:text-5xl font-semibold tracking-tight text-white mb-3">
-            {destinations[activeSlide].title}
-          </h1>
-          <p className="font-sans text-neutral-200 text-base sm:text-lg mb-8 max-w-lg leading-relaxed">
-            {destinations[activeSlide].tagline}
-          </p>
+          </motion.span>
           
-          <div className="flex gap-4">
+          <AnimatePresence mode="wait">
+            <motion.h1 
+              key={activeSlide}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.5 }}
+              className="font-fraunces text-4xl sm:text-5xl font-semibold tracking-tight text-white mb-3"
+            >
+              {destinations[activeSlide].title}
+            </motion.h1>
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            <motion.p 
+              key={activeSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="font-sans text-neutral-200 text-base sm:text-lg mb-8 max-w-lg leading-relaxed"
+            >
+              {destinations[activeSlide].tagline}
+            </motion.p>
+          </AnimatePresence>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex gap-4"
+          >
             <Link
               href="/trip-planner"
               className="bg-secondary hover:bg-secondary-dark text-white font-semibold py-3 px-6 text-sm rounded-xl shadow-md transition-colors"
@@ -188,14 +241,14 @@ export default function Home() {
             >
               Explore Packages
             </Link>
-          </div>
+          </motion.div>
         </div>
 
         {/* Interactive Slider Navigation Elements */}
         <div className="absolute bottom-6 right-6 z-10 flex items-center gap-3">
           <button
             onClick={handlePrevSlide}
-            className="p-2.5 rounded-full bg-black/45 border border-white/20 text-white hover:bg-black/60 transition-colors"
+            className="p-2.5 rounded-full bg-black/45 border border-white/20 text-white hover:bg-black/60 transition-colors cursor-pointer"
             aria-label="Previous destination"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -217,13 +270,48 @@ export default function Home() {
 
           <button
             onClick={handleNextSlide}
-            className="p-2.5 rounded-full bg-black/45 border border-white/20 text-white hover:bg-black/60 transition-colors"
+            className="p-2.5 rounded-full bg-black/45 border border-white/20 text-white hover:bg-black/60 transition-colors cursor-pointer"
             aria-label="Next destination"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
+        </div>
+      </section>
+
+      {/* TRUST / CRO CONVERSION VALUE BAR */}
+      <section className="bg-white border-b border-neutral-200 py-6">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
+          <div className="flex items-center gap-4 justify-center sm:justify-start">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+              🛡️
+            </div>
+            <div>
+              <h4 className="font-fraunces text-sm font-semibold text-neutral-900">Verified Catalog Data</h4>
+              <p className="text-xs text-neutral-450 mt-0.5">Real packages, grounded pricing, zero hallucinated rates.</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4 justify-center sm:justify-start border-y sm:border-y-0 sm:border-x border-neutral-200 py-4 sm:py-0 sm:px-6">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+              ⚡
+            </div>
+            <div>
+              <h4 className="font-fraunces text-sm font-semibold text-neutral-900">Under 2hr Admin Quotes</h4>
+              <p className="text-xs text-neutral-450 mt-0.5">Submit a customizable AI request, review quote immediately.</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 justify-center sm:justify-start">
+            <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg">
+              🗺️
+            </div>
+            <div>
+              <h4 className="font-fraunces text-sm font-semibold text-neutral-900">Human-Audited Customization</h4>
+              <p className="text-xs text-neutral-450 mt-0.5">Every AI package matches active flights, lodging, and guides.</p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -235,8 +323,14 @@ export default function Home() {
           <p className="text-neutral-700 font-sans text-sm mt-3">Combining personalized human support with generative agent frameworks to produce singular journeys.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          <motion.div variants={itemVariants} className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -246,9 +340,9 @@ export default function Home() {
             <p className="text-neutral-700 text-sm leading-relaxed">
               We process filters, destination logs, and custom interests to rank available routes and options automatically.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
+          <motion.div variants={itemVariants} className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -258,9 +352,9 @@ export default function Home() {
             <p className="text-neutral-700 text-sm leading-relaxed">
               Refine your recommendations using interactive chat prompts, adjusting items for pricing constraints dynamically.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
+          <motion.div variants={itemVariants} className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 hover:shadow-sm transition-shadow">
             <div className="h-12 w-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6">
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -270,8 +364,8 @@ export default function Home() {
             <p className="text-neutral-700 text-sm leading-relaxed">
               Every custom recommendation is verified and quote-checked by an admin, guaranteeing secure pricing.
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* SECTION 2: SPOTLIGHT PACKAGES (4 CARDS PER ROW IN DESKTOP) */}
@@ -287,10 +381,17 @@ export default function Home() {
         </div>
 
         {/* 4 Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {spotCards.map((card, idx) => (
-            <div
+            <motion.div
               key={idx}
+              variants={itemVariants}
               className="bg-neutral-100 rounded-xl overflow-hidden border border-neutral-200 flex flex-col hover:shadow-md transition-shadow h-full"
             >
               <div className="h-44 overflow-hidden relative">
@@ -320,13 +421,19 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* SECTION 3: INTELLIGENCE AT WORK */}
-      <section className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200 bg-neutral-100 rounded-2xl my-10 border border-neutral-200">
+      <motion.section 
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200 bg-neutral-100 rounded-2xl my-10 border border-neutral-200"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <span className="text-primary font-semibold text-xs uppercase tracking-widest block">Core Technology</span>
@@ -351,7 +458,7 @@ export default function Home() {
             />
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* SECTION 4: BY THE NUMBERS */}
       <section className="py-16 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200">
@@ -384,17 +491,30 @@ export default function Home() {
       </section>
 
       {/* SECTION 5: TRAVELER TESTIMONIALS */}
-      <section className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200">
+      <motion.section 
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200"
+      >
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-primary font-semibold text-xs uppercase tracking-widest block mb-2">Reviews</span>
           <h2 className="font-fraunces text-3xl font-semibold text-neutral-900 text-center">Verified Traveler Stories</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
           {testimonials.map((test, index) => (
-            <div
+            <motion.div
               key={index}
-              className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 flex flex-col justify-between hover:shadow-sm transition-shadow"
+              variants={itemVariants}
+              className="bg-neutral-100 p-8 rounded-xl border border-neutral-200 flex flex-col justify-between hover:shadow-sm transition-shadow animate-card"
             >
               <p className="text-sm text-neutral-700 italic leading-relaxed mb-6 font-sans">
                 &ldquo;{test.review}&rdquo;
@@ -413,10 +533,10 @@ export default function Home() {
                   <span className="text-xs text-neutral-400">{test.location}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* SECTION 6: FAQ ACCORDION (INTERACTIVE) */}
       <section className="py-20 px-6 max-w-4xl mx-auto sm:px-8 border-b border-neutral-200">
@@ -456,7 +576,13 @@ export default function Home() {
       </section>
 
       {/* SECTION 7: SPECIFIC LATEST JOURNAL HIGHLIGHTS */}
-      <section className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200">
+      <motion.section 
+        initial={{ opacity: 0, y: 25 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="py-20 px-6 max-w-7xl mx-auto sm:px-8 border-b border-neutral-200"
+      >
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12">
           <div>
             <span className="text-primary font-semibold text-xs uppercase tracking-widest block mb-2">Read Curation</span>
@@ -467,9 +593,15 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
           {/* Blog post 1 */}
-          <div className="bg-neutral-100 border border-neutral-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col sm:flex-row">
+          <motion.div variants={itemVariants} className="bg-neutral-100 border border-neutral-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col sm:flex-row">
             <div className="h-48 sm:h-auto sm:w-48 shrink-0 relative overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=400&q=80"
@@ -491,10 +623,10 @@ export default function Home() {
                 Read Article →
               </Link>
             </div>
-          </div>
+          </motion.div>
 
           {/* Blog post 2 */}
-          <div className="bg-neutral-100 border border-neutral-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col sm:flex-row">
+          <motion.div variants={itemVariants} className="bg-neutral-100 border border-neutral-200 rounded-xl overflow-hidden hover:shadow-md transition-all flex flex-col sm:flex-row">
             <div className="h-48 sm:h-auto sm:w-48 shrink-0 relative overflow-hidden">
               <img
                 src="https://images.unsplash.com/photo-1502784444187-359ac186c5bb?auto=format&fit=crop&w=400&q=80"
@@ -516,12 +648,18 @@ export default function Home() {
                 Read Article →
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
       {/* SECTION 8: LAUNCH NEWSLETTER SUBSCRIPTIONS */}
-      <section className="py-20 px-6 max-w-5xl mx-auto sm:px-8 text-center">
+      <motion.section 
+        initial={{ opacity: 0, scale: 0.98 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6 }}
+        className="py-20 px-6 max-w-5xl mx-auto sm:px-8 text-center"
+      >
         <div className="bg-primary text-white rounded-2xl p-8 sm:p-12 relative overflow-hidden shadow-lg">
           {/* Visual gradient overlays */}
           <div className="absolute inset-0 bg-gradient-to-tr from-primary-dark via-primary to-primary-light opacity-90 z-0" />
@@ -557,7 +695,7 @@ export default function Home() {
             </form>
           </div>
         </div>
-      </section>
+      </motion.section>
 
     </div>
   );

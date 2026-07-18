@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand block */}
           <div className="space-y-4 xl:col-span-1">
             <Link href="/" className="flex items-center space-x-2">
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-xl font-bold tracking-tight text-transparent dark:from-blue-400 dark:to-indigo-400">
+              <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-xl font-bold tracking-tight text-transparent">
                 Travel AI
               </span>
             </Link>
@@ -23,34 +23,34 @@ export default function Footer() {
           <div className="mt-8 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-650">
                   Explore
                 </h3>
                 <ul className="mt-4 space-y-3">
                   <li>
-                    <Link href="/explore" className="text-sm text-zinc-650 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+                    <Link href="/explore" className="text-sm text-zinc-650 hover:text-primary dark:text-zinc-405 dark:hover:text-primary-light">
                       Travel Packages
                     </Link>
                   </li>
                   <li>
-                    <Link href="/trip-planner" className="text-sm text-zinc-650 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+                    <Link href="/trip-planner" className="text-sm text-zinc-650 hover:text-primary dark:text-zinc-405 dark:hover:text-primary-light">
                       AI Planner
                     </Link>
                   </li>
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-650">
                   Company
                 </h3>
                 <ul className="mt-4 space-y-3">
                   <li>
-                    <Link href="/about" className="text-sm text-zinc-650 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+                    <Link href="/about" className="text-sm text-zinc-650 hover:text-primary dark:text-zinc-405 dark:hover:text-primary-light">
                       About Us
                     </Link>
                   </li>
                   <li>
-                    <Link href="/blog" className="text-sm text-zinc-650 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+                    <Link href="/blog" className="text-sm text-zinc-650 hover:text-primary dark:text-zinc-405 dark:hover:text-primary-light">
                       Travel Blog
                     </Link>
                   </li>
