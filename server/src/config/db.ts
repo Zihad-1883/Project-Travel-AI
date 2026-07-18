@@ -17,9 +17,18 @@ export async function connectToDatabase(): Promise<Db> {
     await client.connect();
     console.log("Successfully connected to MongoDB database");
 
-    // Retrieve database name from URI or use a default
-    // URI usually has /dbName?options. We can find the dbName or let mongodb use its default (e.g. travel-ai)
     db = client.db("travel-ai");
+    
+    // Create indexes for location, price, and rating to optimize filters
+    try {
+      await db.collection("packages").createIndex({ location: 1 });
+      await db.collection("packages").createIndex({ price: 1 });
+      await db.collection("packages").createIndex({ rating: -1 });
+      console.log("Database indexes for packages created/verified successfully");
+    } catch (indexError) {
+      console.error("Warning: Failed to create package collection indexes:", indexError);
+    }
+
     return db;
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
