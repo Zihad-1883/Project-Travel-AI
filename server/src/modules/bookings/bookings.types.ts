@@ -5,7 +5,7 @@ export interface Booking {
   _id?: ObjectId;
   userId: ObjectId;
   packageId: ObjectId;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "cancelled";
   createdAt: Date;
   updatedAt: Date;
   packageDetails?: Package;

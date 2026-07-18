@@ -8,7 +8,7 @@ export interface Booking {
   _id: string;
   userId: string;
   packageId: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "cancelled";
   createdAt: string;
   updatedAt: string;
   packageDetails?: Package;
@@ -18,10 +18,11 @@ export interface Booking {
   };
 }
 
-export function useBookings() {
+export function useBookings(options?: { enabled?: boolean }) {
   return useQuery<Booking[], Error>({
     queryKey: ["bookings"],
     queryFn: () => apiFetch<Booking[]>("/api/bookings"),
+    ...options,
   });
 }
 
@@ -41,7 +42,7 @@ export function useCreateBooking() {
 
 export function useUpdateBookingStatus() {
   const queryClient = useQueryClient();
-  return useMutation<Booking, Error, { id: string; status: "approved" | "rejected" }>({
+  return useMutation<Booking, Error, { id: string; status: "approved" | "rejected" | "cancelled" }>({
     mutationFn: ({ id, status }) =>
       apiFetch<Booking>(`/api/bookings/${id}/status`, {
         method: "PATCH",

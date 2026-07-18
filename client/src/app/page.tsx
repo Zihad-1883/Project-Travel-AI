@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -50,6 +50,14 @@ const itemVariants = {
 export default function Home() {
   // Hero Interactive Slider State
   const [activeSlide, setActiveSlide] = useState<number>(0);
+
+  // Auto-rotate background image every 5 seconds (interval resets when user manually navigates)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % 3);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [activeSlide]);
 
   const destinations: Destination[] = [
     {

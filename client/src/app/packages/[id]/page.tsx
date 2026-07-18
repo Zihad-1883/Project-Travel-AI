@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePackageDetails, usePackages, Package } from "@/hooks/usePackages";
 import { useAuth } from "@/context/AuthContext";
-import { useCreateBooking } from "@/hooks/useBookings";
+import { useCreateBooking, useBookings } from "@/hooks/useBookings";
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -22,6 +22,10 @@ export default function PackageDetailPage() {
 
   // Booking state
   const createBookingMutation = useCreateBooking();
+  const { data: bookings = [] } = useBookings();
+  const hasBooked = !!user && bookings.some(
+    (b) => b.packageId === id && (b.status === "pending" || b.status === "approved")
+  );
   const [showBookingConfirm, setShowBookingConfirm] = useState(false);
   const [bookingMessage, setBookingMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -196,10 +200,14 @@ export default function PackageDetailPage() {
               {user?.role !== "admin" && (
                 <button
                   onClick={handleBookNow}
-                  disabled={createBookingMutation.isPending}
+                  disabled={createBookingMutation.isPending || hasBooked}
                   className="w-full text-center block bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 text-sm rounded-xl shadow-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {createBookingMutation.isPending ? "Booking..." : "Book Now"}
+                  {createBookingMutation.isPending
+                    ? "Booking..."
+                    : hasBooked
+                    ? "Already Booked"
+                    : "Book Now"}
                 </button>
               )}
 

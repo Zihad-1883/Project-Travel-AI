@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { bookingsController } from "./bookings.controller";
 import { authMiddleware } from "../../middleware/auth.middleware";
-import { roleMiddleware } from "../../middleware/role.middleware";
 
 const router = Router();
 
@@ -9,7 +8,7 @@ const router = Router();
 router.post("/", authMiddleware, bookingsController.create);
 router.get("/", authMiddleware, bookingsController.getList);
 
-// Admin-only route
-router.patch("/:id/status", authMiddleware, roleMiddleware(["admin"]), bookingsController.updateStatus);
+// Authenticated users route (admin can edit any status, user can only cancel their own)
+router.patch("/:id/status", authMiddleware, bookingsController.updateStatus);
 
 export default router;

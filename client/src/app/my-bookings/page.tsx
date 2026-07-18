@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useBookings, Booking } from "@/hooks/useBookings";
+import { useBookings, Booking, useUpdateBookingStatus } from "@/hooks/useBookings";
 
 export default function MyBookingsPage() {
   const { user, loading } = useAuth();
@@ -19,6 +19,17 @@ export default function MyBookingsPage() {
 
   // Fetch traveler bookings
   const { data: bookings = [], isLoading, error } = useBookings();
+  const updateBookingMutation = useUpdateBookingStatus();
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    try {
+      await updateBookingMutation.mutateAsync({ id: bookingId, status: "cancelled" });
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to cancel booking.";
+      alert(errorMsg);
+    }
+  };
 
   if (loading || !user) {
     return (
@@ -42,6 +53,13 @@ export default function MyBookingsPage() {
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-secondary/10 border border-secondary/20 text-secondary">
             <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
             Rejected
+          </span>
+        );
+      case "cancelled":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-neutral-100 border border-neutral-250 text-neutral-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-neutral-400" />
+            Cancelled
           </span>
         );
       default:
@@ -146,6 +164,15 @@ export default function MyBookingsPage() {
                       <span className="text-xs text-neutral-400 md:hidden">Request Status:</span>
                       {getStatusBadge(booking.status)}
                     </div>
+                    {(booking.status === "pending" || booking.status === "approved") && (
+                      <button
+                        onClick={() => handleCancelBooking(booking._id)}
+                        disabled={updateBookingMutation.isPending}
+                        className="px-4 py-2 bg-secondary/10 hover:bg-secondary/20 text-secondary rounded-xl text-xs font-semibold text-center mt-2 sm:mt-0 transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        Cancel Booking
+                      </button>
+                    )}
                     <Link
                       href={`/packages/${pkg._id}`}
                       className="px-4 py-2 border border-neutral-200 hover:border-neutral-350 text-neutral-700 hover:text-neutral-900 rounded-xl text-xs font-semibold text-center mt-2 sm:mt-0 transition-colors"

@@ -92,7 +92,7 @@ async function findAllBookings(): Promise<Booking[]> {
     .toArray() as Promise<Booking[]>;
 }
 
-async function updateStatus(id: string, status: "approved" | "rejected"): Promise<Booking | null> {
+async function updateStatus(id: string, status: "approved" | "rejected" | "cancelled"): Promise<Booking | null> {
   if (!ObjectId.isValid(id)) return null;
   const result = await getCollection().findOneAndUpdate(
     { _id: new ObjectId(id) },
@@ -107,10 +107,20 @@ async function findById(id: string): Promise<Booking | null> {
   return getCollection().findOne({ _id: new ObjectId(id) });
 }
 
+async function findActiveBooking(userId: string, packageId: string): Promise<Booking | null> {
+  if (!ObjectId.isValid(userId) || !ObjectId.isValid(packageId)) return null;
+  return getCollection().findOne({
+    userId: new ObjectId(userId),
+    packageId: new ObjectId(packageId),
+    status: { $in: ["pending", "approved"] },
+  });
+}
+
 export const bookingsService = {
   create,
   findTravelerBookings,
   findAllBookings,
   updateStatus,
   findById,
+  findActiveBooking,
 };

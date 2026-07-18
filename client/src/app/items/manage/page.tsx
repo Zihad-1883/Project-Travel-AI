@@ -193,30 +193,36 @@ export default function ManagePackagesPage() {
         {/* Main Content Dashboard Container */}
         <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm">
           {/* Tabs Navigation Header */}
-          <div className="border-b border-neutral-200 px-6 py-4 flex items-center justify-between bg-neutral-50/50">
+          <div className="border-b border-neutral-200 px-6 pt-4 pb-0 flex items-center justify-between bg-neutral-50/50">
             <div className="flex gap-6">
               <button
                 onClick={() => setActiveTab("packages")}
-                className={`text-sm font-semibold pb-1 cursor-pointer transition-colors ${
+                className={`text-sm font-semibold pb-3 relative transition-colors cursor-pointer ${
                   activeTab === "packages"
-                    ? "text-primary border-b-2 border-primary -mb-[18px]"
-                    : "text-neutral-450 hover:text-neutral-900 font-medium"
+                    ? "text-primary font-bold animate-fade-in"
+                    : "text-neutral-450 hover:text-neutral-950 font-medium"
                 }`}
               >
                 My Packages
+                {activeTab === "packages" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
               </button>
               <button
                 onClick={() => setActiveTab("bookings")}
-                className={`text-sm font-semibold pb-1 cursor-pointer transition-colors ${
+                className={`text-sm font-semibold pb-3 relative transition-colors cursor-pointer ${
                   activeTab === "bookings"
-                    ? "text-primary border-b-2 border-primary -mb-[18px]"
-                    : "text-neutral-450 hover:text-neutral-900 font-medium"
+                    ? "text-primary font-bold animate-fade-in"
+                    : "text-neutral-450 hover:text-neutral-950 font-medium"
                 }`}
               >
-                Standard Bookings
+                Requested Bookings
+                {activeTab === "bookings" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
               </button>
             </div>
-            <span className="text-xs text-neutral-400 font-mono">
+            <span className="text-xs text-neutral-400 font-mono pb-3">
               Count: {activeTab === "packages" ? list.length : bookingsList.length}
             </span>
           </div>
@@ -375,31 +381,33 @@ export default function ManagePackagesPage() {
                         </div>
 
                         {/* Status / Admin Actions */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-row whitespace-nowrap">
                           {booking.status === "pending" ? (
-                            <>
+                            <div className="flex items-center gap-2">
                               <button
                                 onClick={() => handleUpdateBookingStatus(booking._id, "approved")}
                                 disabled={updateBookingMutation.isPending}
-                                className="px-3.5 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                                className="px-3.5 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
                               >
                                 Approve
                               </button>
                               <button
                                 onClick={() => handleUpdateBookingStatus(booking._id, "rejected")}
                                 disabled={updateBookingMutation.isPending}
-                                className="px-3.5 py-1.5 bg-secondary hover:bg-secondary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                                className="px-3.5 py-1.5 bg-secondary hover:bg-secondary-dark text-white rounded-xl text-xs font-semibold shadow-sm transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
                               >
                                 Reject
                               </button>
-                            </>
+                            </div>
                           ) : (
                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
                               booking.status === "approved"
                                 ? "bg-primary/10 border-primary/20 text-primary"
+                                : booking.status === "cancelled"
+                                ? "bg-neutral-100 border-neutral-250 text-neutral-500"
                                 : "bg-secondary/10 border-secondary/20 text-secondary"
                             }`}>
-                              {booking.status === "approved" ? "Approved" : "Rejected"}
+                              {booking.status === "approved" ? "Approved" : booking.status === "cancelled" ? "Cancelled" : "Rejected"}
                             </span>
                           )}
                         </div>

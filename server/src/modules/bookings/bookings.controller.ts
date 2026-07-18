@@ -21,6 +21,12 @@ async function create(req: Request, res: Response): Promise<void> {
       return;
     }
 
+    const activeBooking = await bookingsService.findActiveBooking(authReq.user.userId, packageId);
+    if (activeBooking) {
+      res.status(400).json({ error: { message: "You have already booked this package." } });
+      return;
+    }
+
     const booking = await bookingsService.create(authReq.user.userId, packageId);
     res.status(201).json(booking);
   } catch (error) {
@@ -63,22 +69,29 @@ async function updateStatus(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    if (authReq.user.role !== "admin") {
-      res.status(403).json({ error: { message: "Forbidden: Admins only" } });
+    if (status !== "approved" && status !== "rejected" && status !== "cancelled") {
+      res.status(400).json({ error: { message: "Status must be 'approved', 'rejected', or 'cancelled'" } });
       return;
     }
 
-    if (status !== "approved" && status !== "rejected") {
-      res.status(400).json({ error: { message: "Status must be either 'approved' or 'rejected'" } });
-      return;
-    }
-
-    const updated = await bookingsService.updateStatus(id, status);
-    if (!updated) {
+    const booking = await bookingsService.findById(id);
+    if (!booking) {
       res.status(404).json({ error: { message: "Booking not found" } });
       return;
     }
 
+    if (authReq.user.role !== "admin") {
+      if (status !== "cancelled") {
+        res.status(403).json({ error: { message: "Forbidden: Only admins can approve or reject bookings" } });
+        return;
+      }
+      if (booking.userId.toString() !== authReq.user.userId) {
+        res.status(403).json({ error: { message: "Forbidden: You cannot cancel another user's booking" } });
+        return;
+      }
+    }
+
+    const updated = await bookingsService.updateStatus(id, status);
     res.status(200).json(updated);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
