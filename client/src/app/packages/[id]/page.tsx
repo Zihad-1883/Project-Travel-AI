@@ -11,14 +11,14 @@ export default function PackageDetailPage() {
 
   // Fetch package details
   const { data: detailData, isLoading: isDetailLoading, error: detailError } = usePackageDetails(id);
-  const pkg = detailData?.data;
+  const pkg = detailData;
 
   // Gallery state
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   // Fetch general packages for related suggestions
   const { data: listData, isLoading: isListLoading } = usePackages({ limit: 4 });
-  const relatedPackages = (listData?.data?.packages || []).filter((p) => p._id !== id).slice(0, 3);
+  const relatedPackages = (listData?.packages || []).filter((p) => p._id !== id).slice(0, 3);
 
   // Loading Skeleton
   if (isDetailLoading) {

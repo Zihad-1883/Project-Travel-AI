@@ -32,22 +32,14 @@ export interface PackagesFilters {
 }
 
 export interface PackagesResponse {
-  success: boolean;
-  data: {
-    packages: Package[];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    };
-  };
+  packages: Package[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
-export interface PackageDetailsResponse {
-  success: boolean;
-  data: Package;
-}
+export type PackageDetailsResponse = Package;
 
 export function usePackages(filters: PackagesFilters) {
   const queryParams: Record<string, string> = {};

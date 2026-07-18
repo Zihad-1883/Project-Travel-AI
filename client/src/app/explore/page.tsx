@@ -66,7 +66,7 @@ function ExploreContent() {
   return (
     <main className="min-h-screen bg-neutral-50 py-12 px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        
+
         {/* Page Title Header */}
         <div className="mb-10 text-center sm:text-left">
           <h1 className="font-fraunces text-4xl font-semibold text-neutral-900 mb-2">
@@ -80,7 +80,7 @@ function ExploreContent() {
         {/* Filter Controls Widget */}
         <div className="bg-neutral-100 rounded-xl border border-neutral-200 p-6 mb-10 shadow-sm space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            
+
             {/* Search Input field */}
             <div className="flex flex-col">
               <label htmlFor="search-input" className="text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-2">
