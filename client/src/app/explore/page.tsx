@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePackages, Package } from "@/hooks/usePackages";
@@ -22,12 +22,17 @@ function ExploreContent() {
   const [page, setPage] = useState<number>(1);
   const limit = 6;
 
-  // Sync state if search params change
-  useEffect(() => {
-    setSearch(searchParams.get("search") || "");
-    setLocation(searchParams.get("location") || "");
+  // Track previous search params to sync/update state when they change externally (e.g. navigation)
+  const [prevSearch, setPrevSearch] = useState(initialSearch);
+  const [prevLocation, setPrevLocation] = useState(initialLocation);
+
+  if (initialSearch !== prevSearch || initialLocation !== prevLocation) {
+    setPrevSearch(initialSearch);
+    setPrevLocation(initialLocation);
+    setSearch(initialSearch);
+    setLocation(initialLocation);
     setPage(1);
-  }, [searchParams]);
+  }
 
   // Query database using custom TanStack hook
   const { data, isLoading, error } = usePackages({
