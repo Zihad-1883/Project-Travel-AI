@@ -6,7 +6,7 @@ const startServer = async () => {
   try {
     console.log("Connecting to MongoDB database...");
     await connectToDatabase();
-    
+
     app.listen(env.PORT, () => {
       console.log(`Server is listening on port ${env.PORT} in ${env.NODE_ENV} mode`);
     });

@@ -17,7 +17,9 @@ const getEnv = (): Env => {
   const MONGODB_URI = process.env.MONGODB_URI;
 
   if (!MONGODB_URI) {
-    throw new Error("CRITICAL CONFIGURATION ERROR: MONGODB_URI is not defined in the environment variables!");
+    throw new Error(
+      "CRITICAL CONFIGURATION ERROR: MONGODB_URI is not defined in the environment variables!"
+    );
   }
 
   // Provide sensible defaults for local development, fallback checks

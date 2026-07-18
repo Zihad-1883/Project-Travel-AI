@@ -14,7 +14,7 @@ export function errorHandler(
 ): void {
   const statusCode = err.statusCode || 500;
   const errorCode = err.code || "INTERNAL_SERVER_ERROR";
-  
+
   // Log server-side only to avoid leaking details
   console.error(`[Error] [Code: ${errorCode}] status: ${statusCode} - message: ${err.message}`);
   if (err.stack && env.NODE_ENV === "development") {
