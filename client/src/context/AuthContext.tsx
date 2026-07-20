@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     destroyToken();
     setUser(null);
-    router.push("/login");
+    router.push("/");
   };
 
   return (
