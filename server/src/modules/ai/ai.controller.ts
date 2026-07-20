@@ -52,6 +52,7 @@ async function streamChat(req: Request, res: Response): Promise<void> {
   res.setHeader("Transfer-Encoding", "chunked");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders();
 
   try {

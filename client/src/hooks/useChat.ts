@@ -128,18 +128,26 @@ export function useChat() {
 
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("travel_ai_token") : null;
+
+      if (!token) {
+        throw new Error("Please log in to use the AI chat assistant.");
+      }
+
       const res = await fetch(`${API_BASE_URL}/api/ai/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ message: text }),
       });
 
       if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Session expired. Please log in again to continue chatting.");
+        }
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `HTTP ${res.status}: Failed to read response stream.`);
+        throw new Error(errorData.error?.message || `Server returned HTTP ${res.status}.`);
       }
 
       const reader = res.body?.getReader();
