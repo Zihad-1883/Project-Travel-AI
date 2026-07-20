@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import QueryProvider from "@/providers/QueryProvider";
+import ChatWidget from "@/components/ai/ChatWidget";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +45,7 @@ export default function RootLayout({
                 {children}
               </main>
               <Footer />
+              <ChatWidget />
             </AuthProvider>
           </QueryProvider>
         </GoogleOAuthProvider>
