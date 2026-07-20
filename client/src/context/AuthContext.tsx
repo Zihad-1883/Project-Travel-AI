@@ -50,9 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch (error) {
           console.error("Failed to fetch fresh user profile:", error);
-          // If token fetch fails due to backend expired status, destroy the token
-          destroyToken();
-          setUser(null);
+          // Only destroy token if there is an explicit authentication failure response
+          const errMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+          const isAuthError = errMessage.includes("unauthorized") || errMessage.includes("token") || errMessage.includes("expired") || errMessage.includes("login");
+          if (isAuthError) {
+            destroyToken();
+            setUser(null);
+          }
         }
       }
       setLoading(false);
