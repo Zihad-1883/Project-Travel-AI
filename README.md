@@ -11,7 +11,7 @@ A full-stack **Agentic AI travel platform** where travelers discover, customize,
 | | URL |
 |---|---|
 | 🌐 **Frontend** | [https://project-travel-ai.vercel.app](https://project-travel-ai.vercel.app) |
-| ⚙️ **Backend API** | Deployed on Render |
+| ⚙️ **Backend API** | [https://project-travel-ai-backend.onrender.com](https://project-travel-ai-backend.onrender.com) |
 | 📁 **GitHub** | [https://github.com/Zihad-1883/Project-Travel-AI](https://github.com/Zihad-1883/Project-Travel-AI) |
 
 ---
