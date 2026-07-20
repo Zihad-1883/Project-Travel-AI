@@ -9,7 +9,7 @@ const router = Router();
 router.post("/recommend", authMiddleware, asyncHandler(aiController.getRecommendations));
 
 // Endpoints for real-time streaming AI chatbot concierge
-router.post("/chat", authMiddleware, aiController.streamChat);
+router.post("/chat", authMiddleware, asyncHandler(aiController.streamChat));
 router.get("/chat/history", authMiddleware, asyncHandler(aiController.getChatHistory));
 router.delete("/chat/history", authMiddleware, asyncHandler(aiController.clearChatHistory));
 
