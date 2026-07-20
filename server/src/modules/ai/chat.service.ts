@@ -238,7 +238,7 @@ Rules:
 
     // Turn 1: Decision on whether tool calls are required
     const initialCompletion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: process.env.GROQ_MODEL || "llama-3.1-8b-instant",
       messages: messageStack as unknown as MessagesInput,
       tools: tools,
       tool_choice: "auto",
@@ -276,7 +276,7 @@ Rules:
     // Turn 2: Generate response (with tools integrated) and STREAM it back
     console.log("Triggering final stream completion response...");
     const stream = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: process.env.GROQ_MODEL || "llama-3.1-8b-instant",
       messages: messageStack as unknown as MessagesInput,
       stream: true,
       temperature: 0.4

@@ -32,8 +32,8 @@ async function getChatCompletion(
 ): Promise<string> {
   try {
     const groq = getGroqInstance();
-    const model = options.model || "llama-3.3-70b-versatile"; // Approved fast and capable model
-    
+    const model = options.model || process.env.GROQ_MODEL || "llama-3.1-8b-instant"; // Higher TPD limits on Free Tier
+
     const responseParams: Parameters<typeof groq.chat.completions.create>[0] = {
       model,
       messages,
@@ -45,7 +45,7 @@ async function getChatCompletion(
     }
 
     const completion = await groq.chat.completions.create(responseParams);
-    
+
     if ("choices" in completion) {
       const content = completion.choices[0]?.message?.content;
       if (!content) {
