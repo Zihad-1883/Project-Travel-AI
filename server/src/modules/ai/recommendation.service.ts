@@ -181,6 +181,7 @@ async function getProgrammaticFallbackRecommendations(
         packageId: pkg._id?.toString() || "",
         matchScore: Math.min(score, 100),
         matchReason,
+        package: pkg,
       };
     });
 
