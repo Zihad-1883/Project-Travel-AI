@@ -1,4 +1,9 @@
 export function getApiBaseUrl(): string {
+  // Respect explicit NEXT_PUBLIC_API_URL config first
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
   if (typeof window !== "undefined") {
     const hostname = window.location.hostname;
     const isLocal = 
@@ -15,10 +20,6 @@ export function getApiBaseUrl(): string {
       // Deployed client site automatically points to production render API backend
       return "https://project-travel-ai.onrender.com";
     }
-  }
-
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
   }
 
   return "http://localhost:5000";
