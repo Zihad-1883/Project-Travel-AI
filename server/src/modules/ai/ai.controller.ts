@@ -49,10 +49,8 @@ async function streamChat(req: Request, res: Response): Promise<void> {
 
   // Set HTTP headers for text chunk streaming
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.setHeader("Transfer-Encoding", "chunked");
   res.setHeader("Cache-Control", "no-cache, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
+  res.setHeader("X-Accel-Buffering", "no"); // Disable buffering on reverse proxies/Nginx
   res.flushHeaders();
 
   try {

@@ -157,32 +157,36 @@ export function useChat() {
         throw new Error("Response body is not readable.");
       }
 
-      let accumulatedText = "";
-      let done = false;
+      try {
+        let accumulatedText = "";
+        let done = false;
 
-      // Loop to read stream chunks
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-        done = readerDone;
-        
-        if (value) {
-          const chunkStr = decoder.decode(value, { stream: !done });
-          accumulatedText += chunkStr;
+        // Loop to read stream chunks
+        while (!done) {
+          const { value, done: readerDone } = await reader.read();
+          done = readerDone;
+          
+          if (value) {
+            const chunkStr = decoder.decode(value, { stream: !done });
+            accumulatedText += chunkStr;
 
-          // Update the last messages array item (which is our placeholder assistant message)
-          setMessages((prev) => {
-            if (prev.length === 0) return prev;
-            const updated = [...prev];
-            const lastIdx = updated.length - 1;
-            if (updated[lastIdx].role === "assistant") {
-              updated[lastIdx] = {
-                ...updated[lastIdx],
-                content: accumulatedText,
-              };
-            }
-            return updated;
-          });
+            // Update the last messages array item (which is our placeholder assistant message)
+            setMessages((prev) => {
+              if (prev.length === 0) return prev;
+              const updated = [...prev];
+              const lastIdx = updated.length - 1;
+              if (updated[lastIdx].role === "assistant") {
+                updated[lastIdx] = {
+                  ...updated[lastIdx],
+                  content: accumulatedText,
+                };
+              }
+              return updated;
+            });
+          }
         }
+      } finally {
+        reader.releaseLock();
       }
 
       // Finish streaming, display dynamic follow-up guidelines
