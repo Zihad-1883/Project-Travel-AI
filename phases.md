@@ -96,8 +96,8 @@
 **Goal:** first required AI feature, fully working, live.
 
 **server/**
-- `modules/ai/claude.service.ts`: isolated Anthropic API calls (server-side only, per `rules.md` §2).
-- `modules/ai/recommendation.service.ts`: sends user profile + real package data to Claude, requests structured JSON, validates response shape before returning.
+- `modules/ai/groq.service.ts`: isolated Groq API calls (server-side only, per `rules.md` §2).
+- `modules/ai/recommendation.service.ts`: sends user profile + real package data to Groq, requests structured JSON, validates response shape before returning.
 - `modules/ai/ai.routes.ts` + `ai.controller.ts`: `POST /api/ai/recommend`.
 - `userInteractions` collection logging (views/saves) feeding into future calls.
 
@@ -105,7 +105,7 @@
 - `app/trip-planner/page.tsx`: preference form UI, ranked results with match reasons, refinement controls.
 - `hooks/useRecommendations.ts` (TanStack Query wrapper).
 
-**Deployment:** redeploy; confirm the live Trip Planner returns real ranked packages and that refining the query changes results, using the production Claude API key (never exposed client-side).
+**Deployment:** redeploy; confirm the live Trip Planner returns real ranked packages and that refining the query changes results, using the production Groq API key (never exposed client-side).
 
 **Done when:** the recommendation engine works end-to-end in production.
 

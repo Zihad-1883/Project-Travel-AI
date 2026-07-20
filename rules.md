@@ -19,7 +19,7 @@
 
 - **TypeScript everywhere** (frontend and backend) — no plain `.js` files in new code.
 - Use the tech stack exactly as defined in `architecture.md`/`requirements.md` (React/Next.js, Tailwind, Express, MongoDB, JWT).
-- Keep all AI provider calls **server-side only**. The frontend never talks to Claude/OpenAI/etc. directly.
+- Keep all AI provider calls **server-side only**. The frontend never talks to Groq/OpenAI/etc. directly.
 - Validate all form input on both client and server.
 - Protect every admin-only and auth-only route on the **backend**, not just by hiding UI elements.
 - Write real content for every page (no lorem ipsum, no "Sample Package," no placeholder images without real captions).
@@ -54,7 +54,7 @@
 | Database | MongoDB (Mongoose recommended for schema structure) | SQL databases, other NoSQL stores |
 | Auth | JWT (jsonwebtoken + bcrypt) or Better Auth | Roll-your-own crypto, storing plaintext passwords |
 | Social login | Google OAuth | Other providers, unless added to `prd.md` first |
-| AI provider | Claude (Anthropic API via `@anthropic-ai/sdk`) | Mixing multiple LLM providers in the same feature without reason |
+| AI provider | Groq (Groq API via `groq-sdk`) | Mixing multiple LLM providers in the same feature without reason |
 | Icons | lucide-react (or one consistent icon set) | Mixing multiple icon libraries |
 | Forms/validation | React Hook Form + Zod (or equivalent) | Unvalidated raw form state |
 
@@ -72,7 +72,7 @@ Any addition to this table requires updating this file — treat it as a changel
   ```
 - Use correct HTTP status codes: `400` validation, `401` unauthenticated, `403` unauthorized/wrong role, `404` not found, `500` unexpected server error.
 - Never leak internal details (stack traces, DB errors, provider error payloads) to the client — log them server-side instead.
-- AI provider calls (Claude) must have their own try/catch with a graceful fallback message ("AI is temporarily unavailable, please try again") — a failed AI call must never crash a page or block core browsing/booking functionality.
+- AI provider calls (Groq) must have their own try/catch with a graceful fallback message ("AI is temporarily unavailable, please try again") — a failed AI call must never crash a page or block core browsing/booking functionality.
 
 **Frontend:**
 - Every data-fetching hook must handle loading, error, and empty states explicitly — no silent blank screens.

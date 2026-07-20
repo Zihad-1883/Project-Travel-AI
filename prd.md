@@ -34,7 +34,7 @@ Only two roles exist. No third-party vendor/sub-agent role is in scope.
 **Frontend:** React.js/Next.js, TypeScript, Tailwind CSS, TanStack Query (or RTK Query), Recharts/Chart.js (for any admin-side stats)
 **Backend:** Node.js, Express.js, TypeScript, MongoDB
 **Auth:** JWT-based authentication, with Google social login
-**AI Provider:** Claude (Anthropic API) — used for both required AI features
+**AI Provider:** Groq (Groq API) — used for both required AI features
 **Deployment:** Live site + GitHub repos for frontend and backend, both required at submission
 
 Nothing outside this stack is to be introduced without updating this document first.
@@ -147,7 +147,7 @@ Any flow that lets a user-customized itinerary become bookable without passing t
 
 ### 8.1 AI Smart Recommendation Engine ("AI Trip Planner")
 - **Input:** structured preference form (budget, trip length, interests, travel style, group type) + implicit signals (saved/viewed packages, logged per user).
-- **Process:** backend sends the user profile + relevant package data to Claude, requesting structured JSON output (packageId, matchScore, reason) — grounded in real DB packages, not invented destinations.
+- **Process:** backend sends the user profile + relevant package data to Groq, requesting structured JSON output (packageId, matchScore, reason) — grounded in real DB packages, not invented destinations.
 - **Output:** ranked package cards with a plain-language match reason.
 - **Refinement:** user can adjust constraints ("cheaper," "shorter") and get re-ranked results — satisfies "filtering and refinement."
 - **Continuous improvement:** every save/click is stored and included as context in future recommendation calls for that user — satisfies "improve based on user interactions" without requiring custom ML training.
