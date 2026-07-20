@@ -11,10 +11,8 @@ export function getApiBaseUrl(): string {
       
     if (isLocal) {
       return `${window.location.protocol}//${hostname}:5000`;
-    }
-
-    // Self-healing fallback for Vercel production/preview deployments
-    if (hostname.endsWith(".vercel.app") || hostname === "project-travel-ai.vercel.app") {
+    } else {
+      // Deployed client site automatically points to production render API backend
       return "https://project-travel-ai.onrender.com";
     }
   }

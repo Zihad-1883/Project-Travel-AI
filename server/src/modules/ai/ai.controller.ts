@@ -53,41 +53,27 @@ async function streamChat(req: Request, res: Response): Promise<void> {
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
   res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
 
   try {
     await chatService.handleChatStream(
       authReq.user.userId,
       message,
       (chunk) => {
-        if (!res.headersSent) {
-          res.flushHeaders();
-        }
         res.write(chunk);
       },
       () => {
-        if (!res.headersSent) {
-          res.flushHeaders();
-        }
         res.end();
       },
       (err) => {
         console.error("Stream compilation error:", err);
-        if (!res.headersSent) {
-          res.status(500).json({ error: { message: err instanceof Error ? err.message : "Failed to generate stream" } });
-        } else {
-          res.write(`\n[ERROR: ${err instanceof Error ? err.message : "Failed to generate stream"}]`);
-          res.end();
-        }
+        res.write(`\n[ERROR: ${err instanceof Error ? err.message : "Failed to generate stream"}]`);
+        res.end();
       }
     );
   } catch (error) {
     console.error("Chat controller failed:", error);
-    if (!res.headersSent) {
-      res.status(500).json({ error: { message: "Failed to initiate chat stream" } });
-    } else {
-      res.write(`\n[ERROR: Failed to initiate chat stream]`);
-      res.end();
-    }
+    res.status(500).json({ error: { message: "Failed to initiate chat stream" } });
   }
 }
 
