@@ -8,7 +8,7 @@ export interface Message {
   createdAt?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+import { API_URL as API_BASE_URL } from "@/lib/api";
 
 const DEFAULT_SUGGESTIONS = [
   "🔍 Search for beach packages",

@@ -22,7 +22,8 @@ app.use(
       
       const isAllowed = allowedOrigins.includes(origin) || 
                         origin.startsWith("http://localhost:") || 
-                        origin.endsWith(".vercel.app");
+                        origin.endsWith(".vercel.app") ||
+                        /^https?:\/\/(127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(origin);
                         
       if (isAllowed) {
         callback(null, true);

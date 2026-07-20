@@ -8,7 +8,8 @@ export interface JWTPayload {
 export function saveToken(token: string): void {
   if (typeof window !== "undefined") {
     localStorage.setItem("travel_ai_token", token);
-    document.cookie = `travel_ai_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+    const isHttps = window.location.protocol === "https:";
+    document.cookie = `travel_ai_token=${token}; path=/; max-age=604800; SameSite=Lax${isHttps ? "; Secure" : ""}`;
   }
 }
 
