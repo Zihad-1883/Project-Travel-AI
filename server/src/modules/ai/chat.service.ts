@@ -77,8 +77,8 @@ const tools = [
           minRating: { type: "string", description: "Minimal rating limit between 1.0 and 5.0 (numeric value as string, e.g. '4.0')" },
           sortBy: { 
             type: "string", 
-            enum: ["price_asc", "price_desc", "rating", "newest"], 
-            description: "Sorting parameter for package lists" 
+            enum: ["price_asc", "price_desc", "rating", "newest", ""], 
+            description: "Sorting parameter for package lists (or empty string/omitted)" 
           },
           limit: { type: "string", description: "Limit number of packages to return (numeric value as string, default '6')" }
         }
