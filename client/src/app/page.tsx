@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 interface Destination {
   title: string;
@@ -684,7 +685,7 @@ export default function Home() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                alert("Thank you for subscribing to our travel newsletters!");
+                toast.success("Thank you for subscribing to our travel newsletters!");
               }}
               className="flex flex-col sm:flex-row gap-3 pt-2 max-w-md mx-auto"
             >

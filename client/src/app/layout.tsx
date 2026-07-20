@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import QueryProvider from "@/providers/QueryProvider";
 import ChatWidget from "@/components/ai/ChatWidget";
+import { Toaster } from "react-hot-toast";
 
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default function RootLayout({
               </main>
               <Footer />
               <ChatWidget />
+              <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
             </AuthProvider>
           </QueryProvider>
         </GoogleOAuthProvider>

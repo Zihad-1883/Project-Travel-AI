@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -25,9 +26,10 @@ export default function MyBookingsPage() {
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
     try {
       await updateBookingMutation.mutateAsync({ id: bookingId, status: "cancelled" });
+      toast.success("Booking cancelled successfully!");
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to cancel booking.";
-      alert(errorMsg);
+      toast.error(errorMsg);
     }
   };
 

@@ -8,6 +8,20 @@ import { apiFetch } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { useBookings, useUpdateBookingStatus, Booking } from "@/hooks/useBookings";
 import { useDeletePackage } from "@/hooks/usePackages";
+import { toast } from "react-hot-toast";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 interface Package {
   _id: string;
@@ -36,6 +50,14 @@ export default function ManagePackagesPage() {
   const router = useRouter();
   const deletePackageMutation = useDeletePackage();
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Redirect if not admin
   useEffect(() => {
     if (!loading && (!user || user.role !== "admin")) {
@@ -49,23 +71,18 @@ export default function ManagePackagesPage() {
   // Modal and action states
   const [deleteTarget, setDeleteTarget] = useState<Package | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [showNotification, setShowNotification] = useState<string | null>(null);
 
   // Fetch admin bookings
   const { data: bookingsList = [], isLoading: isBookingsLoading, error: bookingsError } = useBookings();
   const updateBookingMutation = useUpdateBookingStatus();
 
   const handleUpdateBookingStatus = async (bookingId: string, status: "approved" | "rejected") => {
-    setActionError(null);
     try {
       await updateBookingMutation.mutateAsync({ id: bookingId, status });
-      setShowNotification(`Booking status updated successfully to ${status}.`);
-      setTimeout(() => {
-        setShowNotification(null);
-      }, 3000);
+      toast.success(`Booking status updated successfully to ${status}.`);
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Failed to update booking status.");
+      const msg = err instanceof Error ? err.message : "Failed to update booking status.";
+      toast.error(msg);
     }
   };
 
@@ -92,18 +109,13 @@ export default function ManagePackagesPage() {
 
   const handleDelete = async (packageId: string) => {
     setDeletingId(packageId);
-    setActionError(null);
-
     try {
       await deletePackageMutation.mutateAsync(packageId);
-      
       setDeleteTarget(null);
-      setShowNotification("Package was successfully deleted.");
-      setTimeout(() => {
-        setShowNotification(null);
-      }, 3000);
+      toast.success("Package was successfully deleted.");
     } catch (err: unknown) {
-      setActionError(err instanceof Error ? err.message : "Failed to delete package.");
+      const msg = err instanceof Error ? err.message : "Failed to delete package.";
+      toast.error(msg);
     } finally {
       setDeletingId(null);
     }
@@ -113,6 +125,37 @@ export default function ManagePackagesPage() {
   const averagePrice = list.length > 0 
     ? Math.round(list.reduce((acc, curr) => acc + curr.price, 0) / list.length) 
     : 0;
+
+  // Location statistics for Packages
+  const locationDataMap: Record<string, number> = {};
+  list.forEach((pkg) => {
+    const loc = pkg.location.split(",")[0] || "Other";
+    locationDataMap[loc] = (locationDataMap[loc] || 0) + 1;
+  });
+  const packageLocationChartData = Object.entries(locationDataMap).map(([name, count]) => ({
+    name,
+    count,
+  }));
+
+  // Status statistics for Bookings
+  const statusDataMap: Record<string, number> = {
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    cancelled: 0,
+  };
+  bookingsList.forEach((b) => {
+    if (statusDataMap[b.status] !== undefined) {
+      statusDataMap[b.status]++;
+    }
+  });
+
+  const bookingsChartData = [
+    { name: "Pending", count: statusDataMap.pending, fill: "#f59e0b" },
+    { name: "Approved", count: statusDataMap.approved, fill: "#10b981" },
+    { name: "Rejected", count: statusDataMap.rejected, fill: "#ef4444" },
+    { name: "Cancelled", count: statusDataMap.cancelled, fill: "#6b7280" },
+  ];
 
   return (
     <main className="min-h-screen bg-neutral-50 py-12 px-6 lg:px-8">
@@ -145,21 +188,7 @@ export default function ManagePackagesPage() {
           </div>
         </div>
 
-        {/* Global Notifications Alert Banner */}
-        {showNotification && (
-          <div className="mb-8 p-4 bg-emerald-50 border border-emerald-250 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2.5 animate-fade-in shadow-sm">
-            <span>✓</span>
-            <span>{showNotification}</span>
-          </div>
-        )}
 
-        {/* Error Notice */}
-        {actionError && (
-          <div className="mb-8 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold flex items-center gap-2.5 shadow-sm">
-            <span>⚠️</span>
-            <span>{actionError}</span>
-          </div>
-        )}
 
         {/* Statistics Widgets Banner */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
@@ -185,6 +214,90 @@ export default function ManagePackagesPage() {
             </div>
           </div>
         </section>
+
+        {/* Visual Analytics Dashboard Row */}
+        {mounted && (list.length > 0 || bookingsList.length > 0) && (
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            {/* Package Curation Chart */}
+            <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm flex flex-col justify-between animate-fade-in">
+              <div className="mb-4">
+                <span className="text-neutral-400 text-xs font-semibold uppercase tracking-wider block">
+                  Package Distribution
+                </span>
+                <h3 className="font-fraunces text-base font-semibold text-neutral-900 mt-1">
+                  Active Templates by Region Location
+                </h3>
+              </div>
+              <div className="h-64 w-full">
+                {packageLocationChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={packageLocationChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+                      <XAxis dataKey="name" stroke="#9ca3af" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#9ca3af" fontSize={11} tickLine={false} allowDecimals={false} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "rgba(255,255,255,0.95)", border: "1px solid #e5e7eb", borderRadius: "12px", fontSize: "12px" }} 
+                      />
+                      <Bar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={32} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-xs text-neutral-400 font-medium">
+                    No package geographic metrics recorded.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bookings Status Chart */}
+            <div className="bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm flex flex-col justify-between animate-fade-in">
+              <div className="mb-4">
+                <span className="text-neutral-400 text-xs font-semibold uppercase tracking-wider block">
+                  Booking Operations
+                </span>
+                <h3 className="font-fraunces text-base font-semibold text-neutral-900 mt-1">
+                  Traveler Requested Bookings by Status
+                </h3>
+              </div>
+              <div className="h-64 w-full">
+                {bookingsList.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={bookingsChartData.filter(d => d.count > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="count"
+                      >
+                        {bookingsChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: "rgba(255,255,255,0.95)", border: "1px solid #e5e7eb", borderRadius: "12px", fontSize: "12px" }} 
+                      />
+                      <Legend 
+                        layout="horizontal" 
+                        verticalAlign="bottom" 
+                        align="center" 
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: "11px", paddingTop: "10px" }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-xs text-neutral-400 font-medium">
+                    No bookings requests metrics calculated yet.
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Main Content Dashboard Container */}
         <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm">

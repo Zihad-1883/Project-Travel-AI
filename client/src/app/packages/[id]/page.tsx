@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePackageDetails, usePackages, Package } from "@/hooks/usePackages";
@@ -36,7 +37,6 @@ export default function PackageDetailPage() {
     (b) => b.packageId === id && (b.status === "pending" || b.status === "approved")
   );
   const [showBookingConfirm, setShowBookingConfirm] = useState(false);
-  const [bookingMessage, setBookingMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleBookNow = () => {
     if (!user) {
@@ -49,17 +49,17 @@ export default function PackageDetailPage() {
   const confirmBooking = async () => {
     try {
       await createBookingMutation.mutateAsync({ packageId: id });
-      setBookingMessage({ type: "success", text: "Expedition booked successfully! Your request status is pending." });
+      toast.success("Expedition booked successfully! Your request status is pending.");
       setShowBookingConfirm(false);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to create booking request.";
-      setBookingMessage({ type: "error", text: errorMsg });
+      toast.error(errorMsg);
       setShowBookingConfirm(false);
     }
   };
 
   // Fetch general packages for related suggestions
-  const { data: listData, isLoading: isListLoading } = usePackages({ limit: 4 });
+  const { data: listData } = usePackages({ limit: 4 });
   const relatedPackages = (listData?.packages || []).filter((p) => p._id !== id).slice(0, 3);
 
   // Loading Skeleton
@@ -194,17 +194,6 @@ export default function PackageDetailPage() {
 
             {/* Custom CTA Action */}
             <div className="pt-4 space-y-3">
-              {bookingMessage && (
-                <div
-                  className={`p-3 border rounded-xl text-xs font-semibold ${
-                    bookingMessage.type === "success"
-                      ? "bg-emerald-50 border-emerald-250 text-emerald-800"
-                      : "bg-rose-50 border-rose-250 text-rose-800"
-                  }`}
-                >
-                  {bookingMessage.text}
-                </div>
-              )}
 
               {user?.role !== "admin" && (
                 <button

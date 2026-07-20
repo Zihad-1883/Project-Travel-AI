@@ -207,7 +207,7 @@ function ExploreContent() {
 
         {/* LOADING STATE - SKELETON LOADERS */}
         {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="animate-pulse bg-neutral-100 border border-neutral-200 rounded-xl overflow-hidden h-96 flex flex-col justify-between p-6">
                 <div className="space-y-4">
@@ -258,7 +258,7 @@ function ExploreContent() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                 {packagesList.map((pkg: Package) => (
                   <article
                     key={pkg._id}
