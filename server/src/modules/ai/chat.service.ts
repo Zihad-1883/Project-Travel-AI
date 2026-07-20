@@ -72,15 +72,15 @@ const tools = [
         properties: {
           search: { type: "string", description: "General keyword to find matching titles or description words" },
           location: { type: "string", description: "Filter by destination city/country" },
-          minPrice: { type: "number", description: "Lower boundary price filter" },
-          maxPrice: { type: "number", description: "Higher boundary price filter" },
-          minRating: { type: "number", description: "Minimal rating limit between 1.0 and 5.0" },
+          minPrice: { type: "string", description: "Lower boundary price filter (numeric value as string, e.g. '500')" },
+          maxPrice: { type: "string", description: "Higher boundary price filter (numeric value as string, e.g. '2000')" },
+          minRating: { type: "string", description: "Minimal rating limit between 1.0 and 5.0 (numeric value as string, e.g. '4.0')" },
           sortBy: { 
             type: "string", 
             enum: ["price_asc", "price_desc", "rating", "newest"], 
             description: "Sorting parameter for package lists" 
           },
-          limit: { type: "number", description: "Limit number of packages to return (default 6)" }
+          limit: { type: "string", description: "Limit number of packages to return (numeric value as string, default '6')" }
         }
       }
     }
@@ -113,6 +113,13 @@ interface BookingWithDetails {
   };
 }
 
+// Safely coerce a value to a number, handling both string and number inputs from the LLM
+function toNumber(val: unknown): number | undefined {
+  if (val === undefined || val === null || val === "") return undefined;
+  const num = Number(val);
+  return isNaN(num) ? undefined : num;
+}
+
 // Handles AI tools execution and formats results
 async function executeTool(name: string, args: Record<string, unknown>, userId: string): Promise<string> {
   try {
@@ -120,11 +127,11 @@ async function executeTool(name: string, args: Record<string, unknown>, userId: 
       console.log("AI executing tool 'searchPackages' with args:", args);
       const search = typeof args.search === "string" ? args.search : undefined;
       const location = typeof args.location === "string" ? args.location : undefined;
-      const minPrice = typeof args.minPrice === "number" ? args.minPrice : undefined;
-      const maxPrice = typeof args.maxPrice === "number" ? args.maxPrice : undefined;
-      const minRating = typeof args.minRating === "number" ? args.minRating : undefined;
+      const minPrice = toNumber(args.minPrice);
+      const maxPrice = toNumber(args.maxPrice);
+      const minRating = toNumber(args.minRating);
       const sortBy = typeof args.sortBy === "string" ? args.sortBy as "price_asc" | "price_desc" | "rating" | "newest" : undefined;
-      const limit = typeof args.limit === "number" ? args.limit : undefined;
+      const limit = toNumber(args.limit);
 
       const result = await packagesService.findAll({
         search,
