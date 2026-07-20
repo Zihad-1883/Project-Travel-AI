@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { apiFetch } from "@/lib/api";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useBookings, useUpdateBookingStatus, Booking } from "@/hooks/useBookings";
+import { useDeletePackage } from "@/hooks/usePackages";
 
 interface Package {
   _id: string;
@@ -33,7 +34,7 @@ interface PackagesListResponse {
 export default function ManagePackagesPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const deletePackageMutation = useDeletePackage();
 
   // Redirect if not admin
   useEffect(() => {
@@ -94,12 +95,7 @@ export default function ManagePackagesPage() {
     setActionError(null);
 
     try {
-      await apiFetch(`/api/packages/${packageId}`, {
-        method: "DELETE",
-      });
-
-      // Refreeh list by invalidating cache queries
-      queryClient.invalidateQueries({ queryKey: ["admin-packages"] });
+      await deletePackageMutation.mutateAsync(packageId);
       
       setDeleteTarget(null);
       setShowNotification("Package was successfully deleted.");

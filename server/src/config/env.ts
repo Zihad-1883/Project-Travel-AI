@@ -9,7 +9,7 @@ export interface Env {
   PORT: number;
   MONGODB_URI: string;
   JWT_SECRET: string;
-  ANTHROPIC_API_KEY?: string;
+  GROQ_API_KEY?: string;
   CLIENT_URL: string;
 }
 
@@ -33,7 +33,7 @@ const getEnv = (): Env => {
     PORT,
     MONGODB_URI,
     JWT_SECRET,
-    ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+    GROQ_API_KEY: process.env.GROQ_API_KEY,
     CLIENT_URL,
   };
 };

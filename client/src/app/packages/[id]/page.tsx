@@ -1,17 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePackageDetails, usePackages, Package } from "@/hooks/usePackages";
 import { useAuth } from "@/context/AuthContext";
 import { useCreateBooking, useBookings } from "@/hooks/useBookings";
+import { useLogInteraction } from "@/hooks/useRecommendations";
 
 export default function PackageDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
   const { user } = useAuth();
+  const logInteractionMutation = useLogInteraction();
+
+  // Log implicit view interaction when traveler opens page
+  useEffect(() => {
+    if (user && id && user.role === "traveler") {
+      logInteractionMutation.mutate({ packageId: id, type: "view" });
+    }
+  }, [user, id, logInteractionMutation]);
 
   // Fetch package details
   const { data: detailData, isLoading: isDetailLoading, error: detailError } = usePackageDetails(id);

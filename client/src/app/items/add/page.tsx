@@ -4,11 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { apiFetch } from "@/lib/api";
+import { useCreatePackage } from "@/hooks/usePackages";
 
 export default function AddPackagePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const createPackageMutation = useCreatePackage();
 
   // Loading and authorization guard
   useEffect(() => {
@@ -64,18 +65,15 @@ export default function AddPackagePage() {
     if (imgUrl3.trim()) images.push(imgUrl3.trim());
 
     try {
-      await apiFetch("/api/packages", {
-        method: "POST",
-        body: JSON.stringify({
-          title: title.trim(),
-          shortDescription: shortDescription.trim(),
-          fullDescription: fullDescription.trim(),
-          price: Number(price),
-          duration: duration.trim() || undefined,
-          location: finalLocation,
-          images,
-          rating: Number(rating) || 5.0,
-        }),
+      await createPackageMutation.mutateAsync({
+        title: title.trim(),
+        shortDescription: shortDescription.trim(),
+        fullDescription: fullDescription.trim(),
+        price: Number(price),
+        duration: duration.trim(),
+        location: finalLocation,
+        images,
+        rating: Number(rating) || 5.0,
       });
 
       setFormSuccess(true);

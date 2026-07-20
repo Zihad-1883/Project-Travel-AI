@@ -11,3 +11,11 @@ export interface User {
   googleId?: string;
   createdAt: Date;
 }
+
+export interface UserInteraction {
+  _id?: ObjectId;
+  userId: ObjectId;
+  packageId: ObjectId;
+  type: "view" | "save";
+  createdAt: Date;
+}

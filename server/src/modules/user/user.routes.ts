@@ -6,5 +6,7 @@ import { asyncHandler } from "../../utils/asyncHandler";
 const router = Router();
 
 router.get("/me", authMiddleware, asyncHandler(userController.getMe));
+router.post("/interactions", authMiddleware, asyncHandler(userController.postInteraction));
+router.get("/interactions", authMiddleware, asyncHandler(userController.getInteractions));
 
 export default router;

@@ -1,9 +1,13 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "../../config/db";
-import { User } from "./user.types";
+import { User, UserInteraction } from "./user.types";
 
 const getCollection = () => {
   return getDb().collection<User>("users");
+};
+
+const getInteractionCollection = () => {
+  return getDb().collection<UserInteraction>("userInteractions");
 };
 
 async function findById(id: string): Promise<User | null> {
@@ -30,9 +34,30 @@ async function create(user: Omit<User, "_id" | "createdAt">): Promise<User> {
   return newUser;
 }
 
+async function logInteraction(userId: string, packageId: string, type: "view" | "save"): Promise<UserInteraction> {
+  const interaction: UserInteraction = {
+    userId: new ObjectId(userId),
+    packageId: new ObjectId(packageId),
+    type,
+    createdAt: new Date(),
+  };
+  await getInteractionCollection().insertOne(interaction);
+  return interaction;
+}
+
+async function getInteractionsForUser(userId: string): Promise<UserInteraction[]> {
+  if (!ObjectId.isValid(userId)) return [];
+  return getInteractionCollection()
+    .find({ userId: new ObjectId(userId) })
+    .sort({ createdAt: -1 })
+    .toArray();
+}
+
 export const userService = {
   findById,
   findByEmail,
   findByGoogleId,
   create,
+  logInteraction,
+  getInteractionsForUser,
 };
